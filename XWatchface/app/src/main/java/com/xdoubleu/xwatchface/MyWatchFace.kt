@@ -5,22 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.*
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.os.BatteryManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
-import android.util.Log
 import android.view.SurfaceHolder
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
 import java.util.*
-import kotlin.math.roundToInt
 
 
 /**
@@ -34,9 +28,7 @@ private const val INTERACTIVE_UPDATE_RATE_MS = 1000
  */
 private const val MSG_UPDATE_TIME = 0
 
-private val DAYS = arrayOf("MON","TUE","WED","THU","FRI","SAT","SUN")
-
-class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
+class MyWatchFace : CanvasWatchFaceService(){
 
     override fun onCreateEngine(): Engine {
         return Engine()
@@ -73,8 +65,10 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
         private var hours = " "
         private var minutes = " "
         private var seconds = " "
+        private var gmtOffset = 0
 
         /*Date*/
+        private val days = arrayOf("monday","tuesday","wednesday","thursday","friday","saturday","sunday")
         private var dayOfWeek = " "
         private var day = " "
         private var month = " "
@@ -83,13 +77,6 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
         /*Battery*/
         private var percentage = 0
         private var chargingStatus = false
-
-        /*Health*/
-        private lateinit var mSensorManager: SensorManager
-        private lateinit var mHeartRateSensor: Sensor
-        private var mHeartRate = 0
-
-
 
 
         private var mAmbient: Boolean = false
@@ -102,16 +89,13 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
         private val mTimeZoneReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 mCalendar.timeZone = TimeZone.getDefault()
+
                 invalidate()
             }
         }
 
         override fun onCreate(holder: SurfaceHolder) {
             super.onCreate(holder)
-
-            this.mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)
-            mSensorManager.registerListener(this@MyWatchFace, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL)
 
             mCalendar = Calendar.getInstance()
 
@@ -151,9 +135,9 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
                 isAntiAlias = true
             }
 
-            textBlue.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD))
-            textGreen.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD))
-            textMagenta.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD))
+            textBlue.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+            textGreen.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+            textMagenta.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
         }
 
         override fun onDestroy() {
@@ -203,37 +187,36 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
         private fun time(){
             val now = System.currentTimeMillis()
             mCalendar.timeInMillis = now
+            val mTimeZone = mCalendar.timeZone
             val twoDigitsFormat = DecimalFormat("00")
 
             hours = twoDigitsFormat.format(mCalendar.get(Calendar.HOUR_OF_DAY))
             minutes = twoDigitsFormat.format(mCalendar.get(Calendar.MINUTE))
             seconds = twoDigitsFormat.format(mCalendar.get(Calendar.SECOND))
 
-            dayOfWeek = DAYS[mCalendar.get(Calendar.DAY_OF_WEEK)-2]
+            dayOfWeek = days[mCalendar.get(Calendar.DAY_OF_WEEK)-2]
             day = twoDigitsFormat.format(mCalendar.get(Calendar.DAY_OF_MONTH))
             month = twoDigitsFormat.format(mCalendar.get(Calendar.MONTH))
             year = mCalendar.get(Calendar.YEAR).toString()
+
+            gmtOffset = mTimeZone.getOffset(mCalendar.timeInMillis)/3600000
         }
 
         private fun getBatteryPercentage() : Int{
             val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-            val level = batteryIntent!!.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-
-            return level
+            return batteryIntent!!.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
         }
 
         private fun isBatteryCharging() : Boolean{
             val batteryStatus: Intent? = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
             val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-            val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
+            return status == BatteryManager.BATTERY_STATUS_CHARGING
                     || status == BatteryManager.BATTERY_STATUS_FULL
-
-            return isCharging
         }
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
             /*Background*/
-            canvas.drawColor(Color.BLACK);
+            canvas.drawColor(Color.BLACK)
 
             drawStaticText(canvas)
             drawDynamicText(canvas)
@@ -259,19 +242,19 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
                 textWhite)
 
             canvas.drawText(
-                "date =",
+                "timezone =",
                 85f,
                 155f,
                 textWhite)
 
             canvas.drawText(
-                "steps =",
+                "day =",
                 85f,
                 195f,
                 textWhite)
 
             canvas.drawText(
-                "hr =",
+                "date =",
                 85f,
                 235f,
                 textWhite)
@@ -308,22 +291,20 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
                 textBlue)
 
             canvas.drawText(
-                "$dayOfWeek $day/$month/$year",
-                190f,
+                "GMT+$gmtOffset",
+                250f,
                 155f,
                 textBlue)
 
-            /*Steps*/
             canvas.drawText(
-                "--",
-                205f,
+                dayOfWeek,
+                175f,
                 195f,
                 textGreen)
 
-            /*hr*/
             canvas.drawText(
-                "-- bpm",
-                160f,
+                "$day/$month/$year",
+                190f,
                 235f,
                 textGreen)
 
@@ -402,17 +383,6 @@ class MyWatchFace : CanvasWatchFaceService(), SensorEventListener {
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs)
             }
         }
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
-    }
-
-    override fun onSensorChanged(event: SensorEvent) {
-        val mHeartRateFloat = event.values[0]
-        val mHeartRate = mHeartRateFloat.roundToInt()
-        
-        Log.i("HR","$mHeartRate")
     }
 }
 
