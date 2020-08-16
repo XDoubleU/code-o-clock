@@ -65,7 +65,7 @@ class MyWatchFace : CanvasWatchFaceService(){
         private var hours = " "
         private var minutes = " "
         private var seconds = " "
-        private var gmtOffset = 0
+        private var gmtOffset = " "
 
         /*Date*/
         private val days = arrayOf("sunday","monday","tuesday","wednesday","thursday","friday","saturday")
@@ -196,10 +196,10 @@ class MyWatchFace : CanvasWatchFaceService(){
 
             dayOfWeek = days[mCalendar.get(Calendar.DAY_OF_WEEK)-1]
             day = twoDigitsFormat.format(mCalendar.get(Calendar.DAY_OF_MONTH))
-            month = twoDigitsFormat.format(mCalendar.get(Calendar.MONTH))
+            month = twoDigitsFormat.format(mCalendar.get(Calendar.MONTH)+1)
             year = mCalendar.get(Calendar.YEAR).toString()
 
-            gmtOffset = mTimeZone.getOffset(mCalendar.timeInMillis)/3600000
+            gmtOffset = twoDigitsFormat.format((mTimeZone.getOffset(mCalendar.timeInMillis)/3600000))
         }
 
         private fun getBatteryPercentage() : Int{
