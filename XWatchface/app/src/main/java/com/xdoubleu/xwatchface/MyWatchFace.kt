@@ -68,7 +68,7 @@ class MyWatchFace : CanvasWatchFaceService(){
         private var gmtOffset = 0
 
         /*Date*/
-        private val days = arrayOf("monday","tuesday","wednesday","thursday","friday","saturday","sunday")
+        private val days = arrayOf("sunday","monday","tuesday","wednesday","thursday","friday","saturday")
         private var dayOfWeek = " "
         private var day = " "
         private var month = " "
@@ -194,7 +194,7 @@ class MyWatchFace : CanvasWatchFaceService(){
             minutes = twoDigitsFormat.format(mCalendar.get(Calendar.MINUTE))
             seconds = twoDigitsFormat.format(mCalendar.get(Calendar.SECOND))
 
-            dayOfWeek = days[mCalendar.get(Calendar.DAY_OF_WEEK)-2]
+            dayOfWeek = days[mCalendar.get(Calendar.DAY_OF_WEEK)-1]
             day = twoDigitsFormat.format(mCalendar.get(Calendar.DAY_OF_MONTH))
             month = twoDigitsFormat.format(mCalendar.get(Calendar.MONTH))
             year = mCalendar.get(Calendar.YEAR).toString()
