@@ -9,7 +9,7 @@ A WearOS WatchFace for programmers.
 
 ## Installation & Usage
 Project can be downloaded and imported to Android Studio. From there you can build the project or debug on the physical device to obtain the watchface.
-A release is also available
+A release is also available.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
