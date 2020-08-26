@@ -1,4 +1,4 @@
-package com.xdoubleu.xwatchface
+package com.xdoubleu.codeoclock
 
 import android.content.BroadcastReceiver
 import android.content.Context
