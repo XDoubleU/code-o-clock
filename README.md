@@ -4,7 +4,7 @@
 
 A WearOS WatchFace for programmers.
 
-[![GitHub](https://img.shields.io/github/license/XDoubleU/code-o-clock)](https://github.com/XDoubleU/code-o-clock/blob/master/LICENSE)
+[![GitHub](https://img.shields.io/github/license/XDoubleU/code-o-clock?style=flat-square)](https://github.com/XDoubleU/code-o-clock/blob/master/LICENSE)
 
 
 ## Installation & Usage
