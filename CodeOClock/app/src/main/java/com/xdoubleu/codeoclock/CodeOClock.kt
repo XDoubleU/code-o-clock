@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Message
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
+import android.text.format.DateFormat.is24HourFormat
 import android.view.SurfaceHolder
 import java.lang.ref.WeakReference
 import java.text.DecimalFormat
@@ -28,14 +29,14 @@ private const val INTERACTIVE_UPDATE_RATE_MS = 1000
  */
 private const val MSG_UPDATE_TIME = 0
 
-class MyWatchFace : CanvasWatchFaceService(){
+class CodeOClock : CanvasWatchFaceService(){
 
     override fun onCreateEngine(): Engine {
         return Engine()
     }
 
-    private class EngineHandler(reference: MyWatchFace.Engine) : Handler() {
-        private val mWeakReference: WeakReference<MyWatchFace.Engine> = WeakReference(reference)
+    private class EngineHandler(reference: CodeOClock.Engine) : Handler() {
+        private val mWeakReference: WeakReference<CodeOClock.Engine> = WeakReference(reference)
 
         override fun handleMessage(msg: Message) {
             val engine = mWeakReference.get()
@@ -62,9 +63,11 @@ class MyWatchFace : CanvasWatchFaceService(){
         /*WatchFace Data*/
 
         /*Time*/
+        private var timestring = " "
         private var hours = " "
         private var minutes = " "
         private var seconds = " "
+        private var ampm = " "
         private var gmtOffset = " "
 
         /*Date*/
@@ -190,9 +193,19 @@ class MyWatchFace : CanvasWatchFaceService(){
             val mTimeZone = mCalendar.timeZone
             val twoDigitsFormat = DecimalFormat("00")
 
-            hours = twoDigitsFormat.format(mCalendar.get(Calendar.HOUR_OF_DAY))
-            minutes = twoDigitsFormat.format(mCalendar.get(Calendar.MINUTE))
-            seconds = twoDigitsFormat.format(mCalendar.get(Calendar.SECOND))
+            if (is24HourFormat(this@CodeOClock)) {
+                hours = twoDigitsFormat.format(mCalendar.get(Calendar.HOUR_OF_DAY))
+                minutes = twoDigitsFormat.format(mCalendar.get(Calendar.MINUTE))
+                seconds = twoDigitsFormat.format(mCalendar.get(Calendar.SECOND))
+                timestring = "$hours:$minutes:$seconds"
+            }
+            else{
+                hours = twoDigitsFormat.format(mCalendar.get(Calendar.HOUR))
+                minutes = twoDigitsFormat.format(mCalendar.get(Calendar.MINUTE))
+                seconds = twoDigitsFormat.format(mCalendar.get(Calendar.SECOND))
+                ampm = if(mCalendar.get(Calendar.AM_PM) == 0) "AM" else "PM"
+                timestring = "$hours:$minutes:$seconds $ampm"
+            }
 
             dayOfWeek = days[mCalendar.get(Calendar.DAY_OF_WEEK)-1]
             day = twoDigitsFormat.format(mCalendar.get(Calendar.DAY_OF_MONTH))
@@ -285,7 +298,7 @@ class MyWatchFace : CanvasWatchFaceService(){
 
 
             canvas.drawText(
-                "$hours:$minutes:$seconds",
+                timestring,
                 190f,
                 115f,
                 textBlue)
@@ -343,7 +356,7 @@ class MyWatchFace : CanvasWatchFaceService(){
             }
             mRegisteredTimeZoneReceiver = true
             val filter = IntentFilter(Intent.ACTION_TIMEZONE_CHANGED)
-            this@MyWatchFace.registerReceiver(mTimeZoneReceiver, filter)
+            this@CodeOClock.registerReceiver(mTimeZoneReceiver, filter)
         }
 
         private fun unregisterReceiver() {
@@ -351,7 +364,7 @@ class MyWatchFace : CanvasWatchFaceService(){
                 return
             }
             mRegisteredTimeZoneReceiver = false
-            this@MyWatchFace.unregisterReceiver(mTimeZoneReceiver)
+            this@CodeOClock.unregisterReceiver(mTimeZoneReceiver)
         }
 
         /**
