@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/watchface.iml" filepath="$PROJECT_DIR$/.idea/modules/watchface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Code_O'_Clock.iml" filepath="$PROJECT_DIR$/.idea/modules/Code_O'_Clock.iml" group="Code_O'_Clock" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="Code O' Clock/app" />
     </modules>
   </component>
 </project>
