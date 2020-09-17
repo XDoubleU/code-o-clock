@@ -8,7 +8,7 @@ A WearOS WatchFace for programmers.
 
 
 ## Installation & Usage
-This watch face can be downloaded from the Google Play Store https://play.google.com/store/apps/details?id=com.xdoubleu.codeoclock.
+This watch face can be downloaded from the [Google Play Store](https://play.google.com/store/apps/details?id=com.xdoubleu.codeoclock).
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
