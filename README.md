@@ -8,8 +8,7 @@ A WearOS WatchFace for programmers.
 
 
 ## Installation & Usage
-Project can be downloaded and imported to Android Studio. From there you can build the project or debug on the physical device to obtain the watchface.
-A release is also available.
+This watch face can be downloaded from the Google Play Store https://play.google.com/store/apps/details?id=com.xdoubleu.codeoclock.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
