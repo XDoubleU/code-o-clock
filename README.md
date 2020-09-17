@@ -1,6 +1,6 @@
 # Code O' Clock
 
-![Code O' Clock](https://github.com/XDoubleU/code-o-clock/blob/master/CodeOClock/app/src/main/res/drawable-nodpi/preview.png)
+![Code O' Clock](https://github.com/XDoubleU/code-o-clock/blob/master/app/src/main/res/drawable-nodpi/preview.png)
 
 A WearOS WatchFace for programmers.
 
